@@ -222,6 +222,12 @@ impl<'a, R: Resources> Renderer<'a, R>{
         }
     }
 
+    /// Updates the output render target view. This is needed when the `RenderTargetView` is
+    /// resized.
+    pub fn update_render_target(&mut self, rtv: &RenderTargetView<R, ColorFormat>) {
+        self.data.out = rtv.clone();
+    }
+
     /// Fill the inner vertex and command buffers by translating the given `primitives`.
     pub fn fill<P, C>(&mut self,
                             encoder: &mut gfx::Encoder<R,C>,
@@ -273,6 +279,8 @@ impl<'a, R: Resources> Renderer<'a, R>{
             y: 0,
             h: screen_h as u16,
         };
+
+        commands.push(PreparedCommand::Scizzor(current_scizzor));
 
         let rect_to_gfx_rect = |rect: Rect| {
             let (w, h) = rect.w_h();

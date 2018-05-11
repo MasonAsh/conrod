@@ -56,7 +56,7 @@ mod feature {
         let mut events_loop = winit::EventsLoop::new();
 
         // Initialize gfx things
-        let (window, mut device, mut factory, rtv, _) =
+        let (window, mut device, mut factory, mut rtv, mut depth_view) =
             gfx_window_glutin::init::<conrod::backend::gfx::ColorFormat, DepthFormat>(builder, context, &events_loop );
         let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
 
@@ -153,6 +153,10 @@ mod feature {
                     winit::Event::WindowEvent{event: winit::WindowEvent::KeyboardInput{input: winit::KeyboardInput{virtual_keycode: Some(winit::VirtualKeyCode::Escape),..}, ..}, .. } |
                     winit::Event::WindowEvent{event: winit::WindowEvent::Closed, ..} =>
                         should_quit = true,
+                    winit::Event::WindowEvent{event: winit::WindowEvent::Resized{..}, ..} => {
+                        gfx_window_glutin::update_views(&window, &mut rtv, &mut depth_view);
+                        renderer.update_render_target(&rtv);
+                    },
                     _ => {},
                 }
             });
